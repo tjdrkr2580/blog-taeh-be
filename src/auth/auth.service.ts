@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDtoSignIn } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt/auth.jwt';
+import { verify } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
   ) {}
 
   async login(dto: AuthDtoSignIn) {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findFirst({
       where: {
         userName: dto.userName,
       },
@@ -40,5 +41,11 @@ export class AuthService {
       token,
       user,
     };
+  }
+
+  tokenValidate(bearer: string) {
+    const token = bearer.slice(7);
+    const payload = verify(token, 'secret');
+    return payload ? true : false;
   }
 }
