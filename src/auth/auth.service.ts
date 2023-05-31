@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { compareSync } from 'bcrypt';
+import { hashSync, compareSync } from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDtoSignIn } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -21,6 +21,7 @@ export class AuthService {
         userName: dto.userName,
       },
     });
+
     if (!user) throw new UnauthorizedException();
 
     const hashPassword = await compareSync(dto.password, user.hashPassword);
